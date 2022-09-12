@@ -1,16 +1,18 @@
 <launch>
   <env name="GAZEBO_MODEL_PATH" value="$GAZEBO_MODEL_PATH:$(find turtlebot3_home_service_challenge_simulation)/models"/>
-  <arg name="use_robot_name" default="tb3_hsc"/>
+  <arg name="use_robot_name" default="mybot"/>
 
   <!-- These are the arguments you can pass this launch file, for example paused:=true -->
-  <arg name="paused" default="true"/>
+  <arg name="paused" default="false"/>
   <arg name="use_sim_time" default="true"/>
   <arg name="gui" default="true"/>
   <arg name="headless" default="false"/>
   <arg name="debug" default="false"/>
   <arg name="verbose" default="false"/>
 
-  <rosparam file="$(find turtlebot3_home_service_challenge_simulation)/config/gazebo_controller.yaml" command="load" />
+  <!-- <rosparam file="$(find turtlebot3_home_service_challenge_simulation)/config/gazebo_controller.yaml" command="load" /> -->
+  <rosparam file="$(find mybot_description)/config/mybot_control.yaml" command="load"/>
+
   
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -23,34 +25,33 @@
     <arg name="verbose" value="$(arg verbose)"/>
   </include>
 
-  <!-- Load the URDF into the ROS Parameter Server -->
-  <group ns = "$(arg use_robot_name)">
-    <param name="robot_description"
-      command="$(find xacro)/xacro --inorder '$(find turtlebot3_manipulation_description)/urdf/turtlebot3_manipulation_robot.urdf.xacro'"/>
+  <!-- Robot pose -->
+  <arg name="x" default="0"/>
+  <arg name="y" default="0"/>
+  <arg name="z" default="0"/>
+  <arg name="roll" default="0"/>
+  <arg name="pitch" default="0"/>
+  <arg name="yaw" default="1.68"/>
 
+  <!-- send robot urdf to param server -->
 
-    <node pkg="gazebo_ros" type="spawn_model" name="urdf_spawner" respawn="false" output="screen"
-      args="-urdf -model $(arg use_robot_name)  -x 0.0 -y 0.0 -Y 0.0 -J joint1 0.0 -J joint2 0.0 -J joint3 0.0 -J joint4 0.0 -J gripper 0.0 -J gripper_sub 0.0 -param robot_description"/>
+  <param name="robot_description" command="$(find xacro)/xacro '$(find mybot_description)/urdf/mybot.urdf.xacro'"/>
 
-    <!-- controller utils -->    
-    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
-       <param name="publish_frequency" type="double" value="100.0" />
-       <param name="tf_prefix" value="$(arg use_robot_name)" />
-    </node>
-    
-    <!-- start joint state controller -->
-    <rosparam file="$(find turtlebot3_manipulation_gazebo)/config/joint_state_controller.yaml" command="load"/>
-    <node name="joint_state_controller_spawner" pkg="controller_manager" type="controller_manager" output="screen"
-      args="spawn joint_state_controller" respawn="false"/>
-
-    <!-- arm controller -->
-    <rosparam file="$(find turtlebot3_manipulation_gazebo)/config/arm_controller.yaml" command="load"/>
-    <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="spawn arm_controller"/>
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+   <node name="mybot_spawn" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" 
+    args="-urdf -param robot_description -model mybot 
+              -x $(arg x) -y $(arg y) -z $(arg z)
+              -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
   
-    <!-- gripper controller -->
-    <rosparam file="$(find turtlebot3_manipulation_gazebo)/config/gripper_controller.yaml" command="load"/>
-    <node name="gripper_controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="spawn gripper_controller"/>
 
-  </group>
+  <rosparam file="$(find mybot_description)/config/mybot_control.yaml" command="load"/>
+  <node name="joint_state_controller_spawner" pkg="controller_manager" type="controller_manager" output="screen"
+    args="spawn joint_state_controller" respawn="false"/>
+  
+  <!-- Load joint controller configurations from YAML file to parameter server -->
+  
+ <rosparam file="$(find mybot_description)/config/gazebo_ros_control_params.yaml" command="load" />
+ <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" respawn="false" output="screen" args="spawn"/>
+
   
 </launch>
