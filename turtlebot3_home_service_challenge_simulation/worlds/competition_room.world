@@ -1457,5 +1457,11 @@
       </link>
       <pose frame=''>-1.35231 1.35231 0.05 0 0 -0.785398</pose>
     </model>
+    <!--  creeper_21_laranja -->
+    <include>
+      <uri>model://creeper_21_laranja</uri>
+      <pose> 1  1 0 0 0 0.843941</pose>
+    </include>
+    
   </world>
 </sdf>
