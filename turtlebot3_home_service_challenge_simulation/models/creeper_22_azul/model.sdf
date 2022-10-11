@@ -23,7 +23,7 @@
         <pose frame=''>0 0 -0.15 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://forca/creepers/creeper_22_azul/materials/textures/creeper.dae</uri>
+            <uri>model://creeper_22_azul/materials/textures/creeper.dae</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>

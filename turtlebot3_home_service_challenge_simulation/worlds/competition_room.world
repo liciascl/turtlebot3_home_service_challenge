@@ -1462,6 +1462,21 @@
       <uri>model://creeper_21_laranja</uri>
       <pose> 1  1 0 0 0 0.843941</pose>
     </include>
+    <!--  creeper_11_azul -->
+    <include>
+      <uri>model://creeper_11_azul</uri>
+      <pose> -1  1 0 0 0 -0.877888</pose>
+    </include>
+    <!--  creeper_12_verde -->
+    <include>
+      <uri>model://creeper_12_verde</uri>
+      <pose> 1  -1 0 0 0 -0.632585</pose>
+    </include>
+    <!--  creeper_22_azul -->
+    <include>
+      <uri>model://creeper_22_azul</uri>
+      <pose> -1  -1 0 0 0 -2.174283</pose>
+    </include>
     
   </world>
 </sdf>
